@@ -16,20 +16,21 @@ def fetch_data(tickers, start, end):
     source = 'google'
     return data.DataReader(tickers, source, start, end).dropna(1, 'all').to_frame()
 
-def prep_vol_hist(df):
-    v = df['Volume']
-    b = v.size
-    if b > 30:
-        b = 30
-    plt.hist(v, bins=b)
-    plt.axvline(v.mean(), color='r')
-    plt.axvline(v.median(), color='b')
-
 def histogram(df):
-    prep_vol_hist(df)
+    # Plot volume data in max of thirty intervals
+    vol = df['Volume']
+    intervals = vol.size
+    if intervals > 30:
+        intervals = 30
+    plt.hist(vol, bins=intervals)
+    # Overlay mean and median
+    plt.axvline(vol.mean(), color='r', label="Mean")
+    plt.axvline(vol.median(), color='g', label="Median")
+    # Title and labels
     plt.title("Volume Histogram")
     plt.xlabel("Volume")
     plt.ylabel("Frequency")
+    plt.legend()
     plt.show()
 
 def scatterplot(df):
@@ -39,10 +40,12 @@ def scatterplot(df):
     # Trend line (linear)
     z = np.polyfit(price_change, df['Volume'], 1)
     trend = np.poly1d(z)
-    plt.plot(price_change, trend(price_change), 'b-')
+    plt.plot(price_change, trend(price_change), 'b-', label="Fitted line")
+    # Title and labels
     plt.title("Price Change-Volume Scatterplot")
     plt.xlabel("Absolute Price Change")
     plt.ylabel("Volume")
+    plt.legend(loc='lower right')
     plt.show()
 
 # Tickers are listed as arguments
