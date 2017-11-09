@@ -18,34 +18,36 @@ def fetch_data(tickers, start, end):
 
 def histogram(df):
     # Plot volume data in max of thirty intervals
-    vol = df['Volume']
+    vol = df['Volume'] / 1000000
     intervals = vol.size
     if intervals > 30:
         intervals = 30
     plt.hist(vol, bins=intervals)
     # Overlay mean and median
-    plt.axvline(vol.mean(), color='r', label="Mean")
-    plt.axvline(vol.median(), color='g', label="Median")
+    plt.axvline(vol.mean(), color='r', label="Mean = {:4.3f}".format(vol.mean()))
+    plt.axvline(vol.median(), color='g', label="Median = {:4.3f}".format(vol.median()))
     # Title and labels
     plt.title("Volume Histogram")
-    plt.xlabel("Volume")
+    plt.xlabel("Volume (in millions)")
     plt.ylabel("Frequency")
     plt.legend()
+    plt.savefig("histogram.svg", format="svg")
     plt.show()
 
 def scatterplot(df):
     # Points
-    price_change = abs(df['Open'] - df['Close'])
-    plt.plot(price_change, df['Volume'], 'ro')
+    pct_change = 100 * abs(df['Open'] - df['Close']) / df['Open']
+    plt.plot(pct_change, df['Volume'] / 1000000, 'ro', label='Observations')
     # Trend line (linear)
-    z = np.polyfit(price_change, df['Volume'], 1)
+    z = np.polyfit(pct_change, df['Volume'] / 1000000, 1)
     trend = np.poly1d(z)
-    plt.plot(price_change, trend(price_change), 'b-', label="Fitted line")
+    plt.plot(pct_change, trend(pct_change), 'b-', label="Linear fit {}".format(trend))
     # Title and labels
     plt.title("Price Change-Volume Scatterplot")
-    plt.xlabel("Absolute Price Change")
-    plt.ylabel("Volume")
+    plt.xlabel("Absolute Percent Price Change")
+    plt.ylabel("Volume (in millions)")
     plt.legend(loc='lower right')
+    plt.savefig("scatterplot.svg", format="svg")
     plt.show()
 
 # Tickers are listed as arguments
